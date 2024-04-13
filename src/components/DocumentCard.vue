@@ -1,14 +1,27 @@
 <template>
     <div class="upload-card">
         <a-card 
-            :hoverable="cardData.fileBinary"
+            :hoverable="!!cardData.fileBinary"
             :body-style="{'display': 'flex', 'flex-direction': 'column', 'align-items': 'center'}"
             @click="downloadFile(cardData.fileBinary)"
         >
-            <component style="font-size: 4rem; margin-bottom: 1rem;" :is="getFileFormatIcon(cardData.filename)" />
-            <span>Имя файла: {{ cardData.filename }}</span>
-            <span>Класс: {{ CLASS_DICT[cardData.predicted_class] }}</span>
-            <span>Вероятность: {{ cardData.probabilities }}</span>
+            <component class="upload-card__icon" :is="getFileFormatIcon(cardData.filename)" />
+            <div class="upload-card__info-row">
+                <span>Имя файла:</span>
+                <span> {{ cardData.filename }}</span>
+            </div>
+            <div class="upload-card__info-row">
+                <span>Класс:</span>
+                <span> {{ CLASS_DICT[cardData.predicted_class] }}</span>
+            </div>
+            <div class="upload-card__info-row">
+                <span>Вероятность:</span>
+                <span> {{ cardData.probabilities }}</span>
+            </div>
+            <div class="upload-card__info-row">
+                <span>Дата загрузки:</span>
+                <span> {{ cardData.uploadDate }}</span>
+            </div>
             <div v-if="cardData.fileBinary" class="upload-card__can-upload">
                 <UploadOutlined />
             </div>
@@ -66,6 +79,8 @@ const getFileFormatIcon = (filename: string) => {
         align-items: center;
     }
     &__icon {
+        font-size: 4rem;
+         margin-bottom: 2rem;
         svg {
             width: 50px;
         }
@@ -75,6 +90,11 @@ const getFileFormatIcon = (filename: string) => {
         left: 1rem;
         top: 1rem;
         font-size: 1rem;
+    }
+    &__info-row {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
     }
 }
 </style>

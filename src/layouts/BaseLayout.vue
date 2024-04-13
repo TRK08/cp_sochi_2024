@@ -32,7 +32,12 @@ const router = useRouter()
 const route = useRoute()
 
 const collapsed = ref<boolean>(false)
-const selectedKeys = computed(() => [route.path])
+const selectedKeys = computed({
+    get() {
+        return [route.path]
+    },
+    set() {}
+})
 
 const menu = reactive([
     {

@@ -63,6 +63,8 @@ const loadZipArchive = async (file: any) => {
             }
         })
 
+        console.log('file FILE', file)
+
         if (data.results) {
             // @ts-ignore
             data.results.forEach(res => {
@@ -70,7 +72,8 @@ const loadZipArchive = async (file: any) => {
                     filename: res.file,
                     id: `${file.file.lastModified}`,
                     predicted_class: res.prediction.predicted_class,
-                    probabilities: res.prediction.probabilities[res.prediction.predicted_class]
+                    probabilities: res.prediction.probabilities[res.prediction.predicted_class],
+                    uploadDate: new Intl.DateTimeFormat('ru-RU').format(file.file.lastModified)
                 })
             })
         }
@@ -122,17 +125,13 @@ const loadSingleFile = async (file: any) => {
                 filename: file.file.name,
                 id: `${file.file.lastModified}`,
                 predicted_class: data.predicted_class,
-                probabilities: data.probabilities[data.predicted_class]
+                probabilities: data.probabilities[data.predicted_class],
+                uploadDate: new Intl.DateTimeFormat('ru-RU').format(file.file.lastModified)
             })
             
         }
         set(cardData.value)
         isLoading.value = false
-        notification.success({
-            message: 'Файл успешно загружен',
-            duration: 5
-        })
-
         const key = `open${Date.now()}`
         notification.success({
             message: 'Файл успешно загружен',
