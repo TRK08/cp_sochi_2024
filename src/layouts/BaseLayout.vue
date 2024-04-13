@@ -2,18 +2,14 @@
     <a-layout class="base-layout">
         <a-layout-sider v-model:collapsed="collapsed" collapsible>
             <div class="base-layout__logo" >
-                <h2 style="color: white;">LOGO</h2>
+                <span>🚀</span>
             </div>
-            <a-menu class="base-layout__menu" v-model:selectedKeys="selectedKeys" theme="dark">
-                <a-menu-item key="1" @click="router.push('/')">
-                    <FileOutlined />
-                    <span>Загрузка файлов</span>
-                </a-menu-item>
-                <a-menu-item key="2" @click="router.push('/results')">
-                    <DesktopOutlined />
-                    <span>Результаты</span>
-                </a-menu-item>           
-            </a-menu>
+            <a-menu 
+                class="base-layout__menu"
+                v-model:selectedKeys="selectedKeys"
+                theme="dark"
+                :items="menu" 
+            />
         </a-layout-sider>
         <a-layout>
             <a-layout-header class="base-layout__header">
@@ -30,12 +26,35 @@ import {
     DesktopOutlined,
     FileOutlined
 } from '@ant-design/icons-vue'
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-const collapsed = ref<boolean>(false)
-const selectedKeys = ref<string[]>(['1'])
-
+import { computed, h, reactive, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 const router = useRouter()
+const route = useRoute()
+
+const collapsed = ref<boolean>(false)
+const selectedKeys = computed(() => [route.path])
+
+const menu = reactive([
+    {
+        key: '/',
+        icon: () => h(FileOutlined),
+        label: 'Загрузка файлов',
+        title: 'Загрузка файлов',
+        onClick: () => {
+            router.push('/')
+        }
+    },
+    {
+        key: '/results',
+        icon: () => h(DesktopOutlined),
+        label: 'Результаты',
+        title: 'Результаты',
+        onClick: () => {
+            router.push('/results')
+        }
+    },
+])
+
 </script>
 <style lang="scss">
 .base-layout {
@@ -45,6 +64,10 @@ const router = useRouter()
         display: flex;
         align-items: center;
         justify-content: center;
+        span {
+            display: block;
+            font-size: 2.5rem;
+        }
     }
     &__header {
         background-color: #fff!important;
