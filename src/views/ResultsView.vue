@@ -3,7 +3,7 @@
         <EmptyFiles v-if="!CardsData.length" />
         <div v-else class="results__wrap">
             <div class="result__filters">
-                <a-input v-model:value="searchValue" placeholder="Поиск по названию" />
+                <a-input v-model:value="searchValue" placeholder="Поиск" />
                 <a-select 
                     v-model:value="filterByClass"
                     size="large"
@@ -40,7 +40,10 @@ const sortedCardsData = computed(() => {
     let data = [...CardsData.value].reverse()
 
     if (searchValue.value) {
-        data = data.filter(card => card.filename.toLowerCase().includes(searchValue.value.toLowerCase()))
+        data = data.filter(card => {
+            const searchString = `${card.filename} ${card.additionalData ? Object.values(card.additionalData).join(' ') : ''}`
+            return searchString.toLowerCase().includes(searchValue.value.toLowerCase())
+        })
     }
 
     if (filterByClass.value) {

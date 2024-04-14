@@ -1,11 +1,12 @@
 <template>
     <div class="upload-card">
         <a-card
-:hoverable="!!cardData.fileBinary"
+            :hoverable="!!cardData.fileBinary"
             :body-style="{ 'display': 'flex', 'flex-direction': 'column', 'align-items': 'center' }"
             @click="downloadFile(cardData.fileBinary)">
             <component class="upload-card__icon" :is="getFileFormatIcon(cardData.filename)" />
-            <div class="upload-card__info-row">
+            <div style="display: flex; flex-direction: column; width: 100%;">
+                <div class="upload-card__info-row">
                 <span>Имя файла:</span>
                 <span> {{ cardData.filename }}</span>
             </div>
@@ -22,12 +23,13 @@
                 <span> {{ cardData.uploadDate }}</span>
             </div>
             <div class="upload-card__info-row" v-for="(key, value) in cardData.additionalData" :key="value">
-                <span>{{ value }}:</span>
+                <span style="text-wrap: nowrap;">{{ ADDITIONAL_FILEDS_DICT[value] }}:</span>
                 <a-tooltip v-if="key.length > 50" placement="right">
                     <template #title>{{ key }}</template>
                     <span :style="{ 'text-align': 'right' }"> {{ key.slice(0, 80) }}... <QuestionCircleOutlined /></span>
                 </a-tooltip>
                 <span v-else :style="{ 'text-align': 'right' }"> {{ key}}</span>
+            </div>
             </div>
             <div v-if="cardData.fileBinary" class="upload-card__can-upload">
                 <UploadOutlined />
@@ -39,7 +41,7 @@
 <script setup lang="ts">
 import type { CardData } from '@/types'
 import { FilePdfOutlined, FileWordOutlined, FileTextOutlined, ProfileOutlined, UploadOutlined, QuestionCircleOutlined } from '@ant-design/icons-vue'
-import { CLASS_DICT } from '@/utilities'
+import { CLASS_DICT, ADDITIONAL_FILEDS_DICT } from '@/utilities'
 type TProps = {
     cardData: CardData
 }
