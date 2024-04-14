@@ -1,6 +1,6 @@
 <template>
-    <div class="results">
-        <EmptyFiles v-if="!CardsData.length && isFinished" />
+    <div class="results" v-if="isFinished">
+        <EmptyFiles v-if="!CardsData.length" />
         <div v-else class="results__wrap">
             <div class="result__filters">
                 <a-input v-model:value="searchValue" placeholder="Поиск по названию" />
