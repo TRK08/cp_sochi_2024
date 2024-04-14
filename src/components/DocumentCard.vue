@@ -1,10 +1,9 @@
 <template>
     <div class="upload-card">
-        <a-card 
-            :hoverable="!!cardData.fileBinary"
-            :body-style="{'display': 'flex', 'flex-direction': 'column', 'align-items': 'center'}"
-            @click="downloadFile(cardData.fileBinary)"
-        >
+        <a-card
+:hoverable="!!cardData.fileBinary"
+            :body-style="{ 'display': 'flex', 'flex-direction': 'column', 'align-items': 'center' }"
+            @click="downloadFile(cardData.fileBinary)">
             <component class="upload-card__icon" :is="getFileFormatIcon(cardData.filename)" />
             <div class="upload-card__info-row">
                 <span>Имя файла:</span>
@@ -22,6 +21,14 @@
                 <span>Дата загрузки:</span>
                 <span> {{ cardData.uploadDate }}</span>
             </div>
+            <div class="upload-card__info-row" v-for="(key, value) in cardData.additionalData" :key="value">
+                <span>{{ value }}:</span>
+                <a-tooltip v-if="key.length > 50" placement="right">
+                    <template #title>{{ key }}</template>
+                    <span :style="{ 'text-align': 'right' }"> {{ key.slice(0, 80) }}... <QuestionCircleOutlined /></span>
+                </a-tooltip>
+                <span v-else :style="{ 'text-align': 'right' }"> {{ key}}</span>
+            </div>
             <div v-if="cardData.fileBinary" class="upload-card__can-upload">
                 <UploadOutlined />
             </div>
@@ -31,7 +38,7 @@
 
 <script setup lang="ts">
 import type { CardData } from '@/types'
-import {FilePdfOutlined, FileWordOutlined, FileTextOutlined, ProfileOutlined, UploadOutlined} from '@ant-design/icons-vue'
+import { FilePdfOutlined, FileWordOutlined, FileTextOutlined, ProfileOutlined, UploadOutlined, QuestionCircleOutlined } from '@ant-design/icons-vue'
 import { CLASS_DICT } from '@/utilities'
 type TProps = {
     cardData: CardData
@@ -61,7 +68,7 @@ const getFileFormatIcon = (filename: string) => {
     case 'rtf':
         return ProfileOutlined
     case 'txt':
-        return FileTextOutlined 
+        return FileTextOutlined
     default:
         return FileTextOutlined
     }
@@ -78,22 +85,27 @@ const getFileFormatIcon = (filename: string) => {
         flex-direction: column;
         align-items: center;
     }
+
     &__icon {
         font-size: 4rem;
-         margin-bottom: 2rem;
+        margin-bottom: 2rem;
+
         svg {
             width: 50px;
         }
     }
+
     &__can-upload {
         position: absolute;
         left: 1rem;
         top: 1rem;
         font-size: 1rem;
     }
+
     &__info-row {
         display: flex;
         justify-content: space-between;
+        gap: 1rem;
         width: 100%;
     }
 }

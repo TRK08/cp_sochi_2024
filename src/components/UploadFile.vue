@@ -1,8 +1,8 @@
 <template>
-    <div>
+    <div class="upload-file">
         <a-upload-dragger
             v-model:fileList="fileList"
-            accept="application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document, application/pdf, text/rtf, text/plain, .zip"
+            :accept="`application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document, application/pdf, text/rtf, text/plain, ${isDeepAnalysis ? '' : '.zip'}`"
             name="file"
             :multiple="true"
             :show-upload-list="false"
@@ -16,12 +16,20 @@
                     </p>
                     <p class="ant-upload-text">Кликните или перетащите файл для загрузки</p>
                     <p class="ant-upload-hint">
-                        Доступные форматы файлов для загрузки: .docx, .doc, .pdf, .rtf, .txt, .zip
+                        Доступные форматы файлов для загрузки: .docx, .doc, .pdf, .rtf, .txt, {{ isDeepAnalysis ? '' : '.zip' }}
                     </p>
                 </div>
                 <a-spin v-else :spinning="isLoading" />
             </div>
         </a-upload-dragger>
+
+        <a-card :body-style="{'padding': '1rem', 'display': 'flex', 'flex-direction': 'column', 'align-items': 'center' }">
+            <div style="display: flex; gap: 1rem; align-items: center; justify-content: center">
+                <h3>Включить более детальный анализ</h3>
+                <a-switch :disabled="isLoading" v-model:checked="isDeepAnalysis" />
+            </div>
+            <p>Данная процедура может занять более продолжительное время</p>
+        </a-card>
     </div>
 </template>
 
@@ -39,6 +47,7 @@ import { useRouter } from 'vue-router'
 const router = useRouter()
 const fileList = ref([])
 const isLoading = ref(false)
+const isDeepAnalysis = ref(false)
 const {data: cardData, set} = useIDBKeyval('test-db', [] as CardData[])
 
 const sendUploadedFile = async (file: any) => {
@@ -48,7 +57,11 @@ const sendUploadedFile = async (file: any) => {
     if (fileExt === 'zip') {
         await loadZipArchive(file)
     } else {
-        await loadSingleFile(file)
+        if (isDeepAnalysis.value) {
+            await loadSingleFileWithDeepAnalysis(file)
+        } else {
+            await loadSingleFile(file)
+        }
     }
 }
 
@@ -161,6 +174,68 @@ const loadSingleFile = async (file: any) => {
         })
     }
 }
+
+const loadSingleFileWithDeepAnalysis = async (file: any) => {
+    isLoading.value = true
+    try {
+        const body = new FormData()
+        body.append('file', file.file)
+        const {data} = await axios.post('https://endless-presently-basilisk.ngrok-free.app/uploadpredict', body, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        })
+
+        if (data) {
+            cardData.value.push({
+                fileBinary: file.file,
+                filename: file.file.name,
+                id: `${file.file.lastModified}`,
+                predicted_class: data.predicted_class,
+                probabilities: data.probabilities[data.predicted_class],
+                uploadDate: new Intl.DateTimeFormat('ru-RU').format(file.file.lastModified),
+                additionalData: {
+                    ...data.data
+                }
+            })
+            
+        }
+        set(cardData.value)
+        isLoading.value = false
+        const key = `open${Date.now()}`
+        notification.success({
+            message: 'Файл успешно загружен',
+            duration: 5,
+            btn: () =>
+                h(
+                    Button,
+                    {
+                        type: 'primary',
+                        size: 'small',
+                        onClick: () => {
+                            router.push('/results')
+                            notification.close(key)
+                        },
+                    },
+                    { default: () => 'Перейти к результатам' },
+                ),
+            key
+        })
+    } catch (e) {
+        isLoading.value = false
+        console.log(e)
+        notification.error({
+            message: 'Ошибка при загрузке файла',
+            duration: 2
+        })
+    }
+}
 </script>
 
-<style lang="scss"></style>
+<style lang="scss">
+.upload-file {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+</style>

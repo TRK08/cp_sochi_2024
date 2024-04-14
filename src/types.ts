@@ -7,4 +7,5 @@ export interface CardData {
     fileBinary?: File
     predicted_class: TDictClass
     probabilities: Record<string, number>
+    additionalData?: Record<string, string>
 }
