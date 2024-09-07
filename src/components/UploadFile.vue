@@ -1,14 +1,7 @@
 <template>
     <div class="upload-file">
-        <a-upload-dragger
-            v-model:fileList="fileList"
-            :accept="`application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document, application/pdf, text/rtf, text/plain, ${isDeepAnalysis ? '' : '.zip'}`"
-            name="file"
-            :multiple="true"
-            :show-upload-list="false"
-            :custom-request="sendUploadedFile"
-            :disabled="isLoading"
-        >
+        <a-upload-dragger v-model:fileList="fileList" accept=".csv" name="file" :multiple="true"
+            :show-upload-list="false" :custom-request="sendUploadedFile" :disabled="isLoading">
             <div style="height: 200px; display: flex; align-items: center; justify-content: center">
                 <div v-if="!isLoading">
                     <p class="ant-upload-drag-icon">
@@ -16,14 +9,15 @@
                     </p>
                     <p class="ant-upload-text">Кликните или перетащите файл для загрузки</p>
                     <p class="ant-upload-hint">
-                        Доступные форматы файлов для загрузки: .docx, .doc, .pdf, .rtf, .txt, {{ isDeepAnalysis ? '' : '.zip' }}
+                        Доступные форматы файлов для загрузки: .csv
                     </p>
                 </div>
                 <a-spin v-else :spinning="isLoading" />
             </div>
         </a-upload-dragger>
 
-        <a-card :body-style="{'padding': '1rem', 'display': 'flex', 'flex-direction': 'column', 'align-items': 'center' }">
+        <a-card
+            :body-style="{ 'padding': '1rem', 'display': 'flex', 'flex-direction': 'column', 'align-items': 'center' }">
             <div style="display: flex; gap: 1rem; align-items: center; justify-content: center">
                 <h3>Включить более детальный анализ</h3>
                 <a-switch :disabled="isLoading" v-model:checked="isDeepAnalysis" />
@@ -48,7 +42,7 @@ const router = useRouter()
 const fileList = ref([])
 const isLoading = ref(false)
 const isDeepAnalysis = ref(false)
-const {data: cardData, set} = useIDBKeyval('test-db', [] as CardData[])
+const { data: cardData, set } = useIDBKeyval('test-db', [] as CardData[])
 
 const sendUploadedFile = async (file: any) => {
     isLoading.value = true
@@ -70,7 +64,7 @@ const loadZipArchive = async (file: any) => {
         const body = new FormData()
         body.append('file', file.file)
 
-        const {data} = await axios.post('https://endless-presently-basilisk.ngrok-free.app/uploadzip', body, {
+        const { data } = await axios.post('https://endless-presently-basilisk.ngrok-free.app/uploadzip', body, {
             headers: {
                 'Content-Type': 'multipart/form-data'
             }
@@ -126,7 +120,7 @@ const loadSingleFile = async (file: any) => {
     try {
         const body = new FormData()
         body.append('file', file.file)
-        const {data} = await axios.post('https://endless-presently-basilisk.ngrok-free.app/uploadfile', body, {
+        const { data } = await axios.post('https://endless-presently-basilisk.ngrok-free.app/uploadfile', body, {
             headers: {
                 'Content-Type': 'multipart/form-data'
             }
@@ -141,7 +135,7 @@ const loadSingleFile = async (file: any) => {
                 probabilities: data.probabilities[data.predicted_class],
                 uploadDate: new Intl.DateTimeFormat('ru-RU').format(file.file.lastModified)
             })
-            
+
         }
         set(cardData.value)
         isLoading.value = false
@@ -180,7 +174,7 @@ const loadSingleFileWithDeepAnalysis = async (file: any) => {
     try {
         const body = new FormData()
         body.append('file', file.file)
-        const {data} = await axios.post('https://endless-presently-basilisk.ngrok-free.app/uploadpredict', body, {
+        const { data } = await axios.post('https://endless-presently-basilisk.ngrok-free.app/uploadpredict', body, {
             headers: {
                 'Content-Type': 'multipart/form-data'
             }
@@ -198,7 +192,7 @@ const loadSingleFileWithDeepAnalysis = async (file: any) => {
                     ...data.data
                 }
             })
-            
+
         }
         set(cardData.value)
         isLoading.value = false

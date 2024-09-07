@@ -15,11 +15,6 @@ const router = createRouter({
                         layout: 'BaseLayout'
                     }
                 },
-                {
-                    path: '/results',
-                    name: 'results',
-                    component: () => import('../views/ResultsView.vue')
-                },
             ]
         },
         { 
